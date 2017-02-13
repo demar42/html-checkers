@@ -1,14 +1,30 @@
 #mainBoard {
-	height: 600px;
-	width: 600px;
-	background-color: black;
-	border-style: solid;
-	border-width: 5px;
-	border-color: maroon;
+  height: 600px;
+  width: 600px;
+  background-color: black;
+  border-style: solid;
+  border-width: 5px;
+  border-color: maroon;
 }
-
 .innerBoxes {
-	height: 75px;
-	width: 75px;
-	float: left;
+  height: 75px;
+  width: 75px;
+  float: left;
+}
+.piece {
+	height: 45px;
+	width: 45px;
+	margin: 0 auto;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: grey;
+	border-radius: 50%;
+	border: 5px solid;
+}
+.playerSoldier {
+  border-color: blue;
+}
+.enemySoldier {
+	border-color: red;
 }
