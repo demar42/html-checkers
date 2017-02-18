@@ -1,5 +1,6 @@
 var playerPositions = [];
 var enemyPositions = [];
+var validPlayerPieces = [];
 var anyMoveIsLegal = true;
 
 function addPieces() {
@@ -73,30 +74,38 @@ function startGame(playerStarting) {
 function playerMove() {
   //Check for mandatory moves
   for (var i = 0; i < playerPositions.length; i++) {
-    var possPosition1 = checkPosition(playerPositions[i], -9);
-    var possPosition2 = checkPosition(playerPositions[i], -11);
-    console.log(possPosition1);
-    if (enemyPositions.indexOf(possPosition1) != -1) {
-      //there is an enemy piece in that square
-      var jumpLandSpace = checkPosition(possPosition1, -9);
-      if (playerPositions.indexOf(jumpLandSpace) == -1 && enemyPositions.indexOf(jumpLandSpace) == -1) {
-        //its empty, therefore mandatory move
-        anyMoveIsLegal = false;
-        alert();
-        document.getElementById(String(jumpLandSpace)).style.backgroundColor = "red";
+    (function () {
+      var isKing = 1;
+      if (document.getElementById(String(playerPositions[i])).classList.contains("playerKing")) {
+        isKing = -1;
       }
-    }
+      //var that holds valid moves FOR THIS PIECE - purpose is for it to be passed onclick
+      var validMoves = [];
+      var validPiece = document.getElementById(String(playerPositions[i])).firstChild;
+      var hasMoves = false;
+      for (var i1 = isKing; i1 < 2; i1 += 2) {
+        for (var i2 = 9; i2 < 12; i2 += 2) {
+          var pieceToCapture = checkPosition(playerPositions[i], -i1 * i2);
+          if(enemyPositions.indexOf(pieceToCapture) != -1) {
+            //there is an enemy in that square
+            var landingSquare = checkPosition(pieceToCapture, -i1 * i2);
+            if(enemyPositions.indexOf(landingSquare) == -1 && playerPositions.indexOf(landingSquare) == -1) {
+              //the landing square is free
+              anyMoveIsLegal = false;
+              hasMoves = true;
+              validPiece.classList.add("valid");
+              validMoves.push(landingSquare);
+              validPlayerPieces.push(String(playerPositions[i]));
+            }
+          }
+        }
+      }
+      if (hasMoves) {
+        console.log(validMoves.length);
+        validPiece.addEventListener("click", function () {movePiece(validMoves, this)});
+      }
 
-    if (enemyPositions.indexOf(possPosition2) != -1) {
-      //there is an enemy piece in that square
-      var jumpLandSpace = checkPosition(possPosition2, -11);
-      if (playerPositions.indexOf(jumpLandSpace) == -1 && enemyPositions.indexOf(jumpLandSpace) == -1) {
-        //its empty, therefore mandatory move
-        anyMoveIsLegal = false;
-        alert();
-        document.getElementById(String(jumpLandSpace)).style.backgroundColor = "red";
-      }
-    }
+    }());
   }
 }
 
@@ -115,5 +124,16 @@ function checkPosition(playerPos, change) {
     return newTotal;
   } else {
     return -1;
+  }
+}
+
+function movePiece(squaresToHighlight, caller) {
+  console.log(squaresToHighlight.length);
+  for (var squares = 0; squares < squaresToHighlight.length; squares++) {
+    (function () {
+      var squareToChange = document.getElementById(String(squaresToHighlight[squares]));
+      squareToChange.classList.add('landingSpace');
+      squareToChange.setAttribute('onclick', 'commitMove(caller, squaresToHighlight[squares])');
+    }());
   }
 }
