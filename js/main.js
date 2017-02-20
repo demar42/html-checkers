@@ -28,14 +28,14 @@ function addPieces() {
         //Append it to the square
         innerBox.appendChild(newPiece);
         //Push it to the array containing all the enemy pieces
-        enemyPositions[enemyPieceIndex].push(Number(innerBox.id));
+        enemyPositions.push(Number(innerBox.id));
       } else if (parseInt(innerBox.id) > 60) {
         //Same thing as above, just for player pieces
         var newPiece = document.createElement('div');
         newPiece.id = "player" + String(pieceNumber);
         newPiece.className = "playerSoldier piece";
         innerBox.appendChild(newPiece);
-        playerPositions[playerPieceIndex].push(Number(innerBox.id));
+        playerPositions.push(Number(innerBox.id));
       }
     }
   }
@@ -126,7 +126,7 @@ function playerMove() {
         //give the piece an onclick if it has moves.
         console.log(validMoves.length);
         //pass an array showing the possible positions as well as the piece's id
-        validPiece.addEventListener("click", function () {movePiece(validMoves, this)});
+        validPiece.addEventListener("click", function() {movePiece(validMoves, this)});
       }
 
     }());
@@ -159,7 +159,29 @@ function movePiece(squaresToHighlight, caller) {
       var squareToChange = document.getElementById(String(squaresToHighlight[squares]));
       squareToChange.classList.add('landingSpace');
       //onclick, pass the id of the piece that needs to be moved, as well as the square its going to move to
-      squareToChange.setAttribute('onclick', 'commitMove(caller, squaresToHighlight[squares])');
+      var landingSquare = squaresToHighlight[squares];
+      squareToChange.addEventListener("click", function() {commitMove(caller, landingSquare)});
     }());
+  }
+}
+
+function commitMove(pieceToBeMoved, squareToMoveTo) {
+  console.log(squareToMoveTo);
+  var piecePosition = Number(pieceToBeMoved.parentNode.id);
+  //Change the number in the array
+  var arrayPosition = playerPositions.indexOf(piecePosition);
+  playerPositions[arrayPosition] = squareToMoveTo;
+  //Move the actual div
+  document.getElementById(String(squareToMoveTo)).appendChild(pieceToBeMoved);
+  //Capture a piece
+  if (Math.abs(piecePosition - squareToMoveTo) > 11) {
+    //The piece has taken a double jump
+    //The captured piece is located in the average between the new pieces
+    var capturedPiecePosition  = (piecePosition + squareToMoveTo)/2;
+    //remove the piece from array
+    enemyPositions[enemyPositions.indexOf(capturedPiecePosition)] = 0;
+    //remove the piece from view
+    var capturedSquare = document.getElementById(String(capturedPiecePosition));
+    capturedSquare.removeChild(capturedSquare.firstChild);
   }
 }
