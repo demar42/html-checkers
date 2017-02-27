@@ -113,13 +113,14 @@ function playerMove() {
                     if (enemyPositions.indexOf(pieceToCapture) != -1) {
                         //there is an enemy in that square
                         var landingSquare = checkPosition(pieceToCapture, -i1 * i2);
-                        if (enemyPositions.indexOf(landingSquare) == -1 && playerPositions.indexOf(landingSquare) == -1) {
+                        if (enemyPositions.indexOf(landingSquare) == -1 && playerPositions.indexOf(landingSquare) == -1 && landingSquare != -1) {
                             //the landing square is free
                             anyMoveIsLegal = false;
                             hasMoves = true;
                             validPiece.classList.add("valid");
                             validMoves.push(landingSquare);
                             validPlayerPieces.push(String(playerPositions[i]));
+                            console.log(landingSquare);
                         }
                     }
                 }
@@ -158,6 +159,7 @@ function checkPosition(playerPos, change) {
 
 //recieved when a valid piece is clicked - recieves the possible positions and the id
 function movePiece(squaresToHighlight, caller) {
+    cleanUp('landingSpace');
     console.log("clicked");
     for (var squares = 0; squares < squaresToHighlight.length; squares++) {
         (function() {
@@ -177,8 +179,9 @@ function movePiece(squaresToHighlight, caller) {
 function commitMove(pieceToBeMoved, squareToMoveTo) {
     //console.log(squareToMoveTo);
     //console.log(pieceToBeMoved);
-    var piecePosition = Number(pieceToBeMoved.parentNode.id);
+    var piecePosition = Number(pieceToBeMoved.id);
     //Change the number in the array
+    console.log(pieceToBeMoved.id);
     var arrayPosition = playerPositions.indexOf(piecePosition);
     playerPositions[arrayPosition] = squareToMoveTo;
     //Move the actual div
@@ -199,10 +202,14 @@ function commitMove(pieceToBeMoved, squareToMoveTo) {
 }
 
 //function that cleans up all the current highlighting and the event listener
-function cleanUp(classToClean, cleanClickListener) {
+function cleanUp(classToClean) {
     //get everything that needs to be cleaned
     var elements = $('.' + classToClean);
-    elements.parent().off("click");
+    if (classToClean == 'valid') {
+        elements.parent().off("click");
+    } else {
+        elements.off("click");
+    }
     //clean off the classes
     elements.removeClass(classToClean);
     /*
