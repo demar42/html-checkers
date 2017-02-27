@@ -10,8 +10,8 @@ The program can be run by opening index.html.
 The player has their mandatory moves highlighted, and if there are no mandatory moves, their available moves are highlighted.
 
 ##To-do
-- [ ] add ability for player to move mandatory moves
+- [x] add ability for player to move mandatory moves
 - [ ] highlight available moves when no mandatory moves
 - [ ] add ability for player to move available moves
-- [ ] add capturing
+- [x] add capturing
 - [ ] add turning into kings
