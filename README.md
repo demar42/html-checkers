@@ -11,7 +11,7 @@ The player has their mandatory moves highlighted, and if there are no mandatory 
 
 ##To-do
 - [x] add ability for player to move mandatory moves
-- [ ] highlight available moves when no mandatory moves
-- [ ] add ability for player to move available moves
+- [x] highlight available moves when no mandatory moves
+- [x] add ability for player to move available moves
 - [x] add capturing
 - [ ] add turning into kings
