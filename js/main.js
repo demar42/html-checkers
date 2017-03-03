@@ -18,11 +18,16 @@ function startGame(playerStarting) {
 
 function playerMove() {
     //Check for mandatory moves
-    mandatoryMoves(userPositions, AIPositions);
+    mandatoryMoves(userPositions, AIPositions, true);
     //is there no mandatory moves?
+    if (anyMoveIsLegal) {
+        mandatoryMoves(userPositions, AIPositions, false);
+    }
+
+    anyMoveIsLegal = true;
 }
 
-function mandatoryMoves(playerPositions, enemyPositions) {
+function mandatoryMoves(playerPositions, enemyPositions, capturing) {
     for (var i = 0; i < playerPositions.length; i++) {
         //prevent variable hoisting
         (function() {
@@ -40,23 +45,31 @@ function mandatoryMoves(playerPositions, enemyPositions) {
                 //Iterate left and right
                 for (var i2 = 9; i2 < 12; i2 += 2) {
                     var pieceToCapture = checkPosition(playerPositions[i], -i1 * i2);
-                    if (enemyPositions.indexOf(pieceToCapture) != -1) {
-                        //there is an enemy in that square
-                        var landingSquare = checkPosition(pieceToCapture, -i1 * i2);
-                        if (enemyPositions.indexOf(landingSquare) == -1 && playerPositions.indexOf(landingSquare) == -1 && landingSquare != -1) {
-                            //the landing square is free
-                            anyMoveIsLegal = false;
+                    if (capturing) {
+                        if (enemyPositions.indexOf(pieceToCapture) != -1) {
+                            //there is an enemy in that square
+                            var landingSquare = checkPosition(pieceToCapture, -i1 * i2);
+                            if (enemyPositions.indexOf(landingSquare) == -1 && playerPositions.indexOf(landingSquare) == -1 && landingSquare != -1) {
+                                //the landing square is free
+                                anyMoveIsLegal = false;
+                                hasMoves = true;
+                                validPiece.classList.add("valid");
+                                validMoves.push(landingSquare);
+                                console.log(landingSquare);
+                            }
+                        }
+                    } else {
+                        if (enemyPositions.indexOf(pieceToCapture) == -1 && playerPositions.indexOf(pieceToCapture) == -1) {
+                            //there's a free space
                             hasMoves = true;
                             validPiece.classList.add("valid");
-                            validMoves.push(landingSquare);
-                            console.log(landingSquare);
+                            validMoves.push(pieceToCapture);
                         }
                     }
                 }
             }
             if (hasMoves) {
                 //give the piece an onclick if it has moves.
-                console.log(validMoves.length);
                 //pass an array showing the possible positions as well as the piece's id
                 $("#" + String(playerPositions[i])).on('click', function() {
                     movePiece(validMoves, this, playerPositions, enemyPositions)
