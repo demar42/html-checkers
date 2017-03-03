@@ -1,86 +1,11 @@
 "use strict";
 
 //variable that holds the positions of the players and enemies
-var playerPositions = [];
-var enemyPositions = [];
-//variable that holds all the player pieces that are "valid" - have valid moves. This is used for highlighting
-var validPlayerPieces = [];
+var userPositions = [];
+var AIPositions = [];
 
 //If there are no mandatory moves, then any move is legal.
 var anyMoveIsLegal = true;
-
-//function that adds pieces to the board
-function addPieces() {
-    //gets all the playing boxes/squares and puts them in an array
-    var innerBoxes = document.getElementsByClassName('innerBoxes');
-
-    for (var pieceNumber = 0; pieceNumber < 64; pieceNumber++) {
-        //Looping through each of the playable squares
-        //Create a local var to hold the playable square in question that the loop has brought focus to
-        var innerBox = innerBoxes[pieceNumber];
-        if (innerBox.className.includes("playableBox")) {
-            //This is where you want to put a soldier
-            if (parseInt(innerBox.id) < 40) {
-                //This is on the far side of the board (enemy side), therefore we are inserting red player pieces
-                //Create the piece as a div
-                var newPiece = document.createElement('div');
-                //Give the piece an id and class
-                newPiece.id = "enemy" + String(pieceNumber);
-                newPiece.className = "enemySoldier piece";
-                //Append it to the square
-                innerBox.appendChild(newPiece);
-                //Push it to the array containing all the enemy pieces
-                enemyPositions.push(Number(innerBox.id));
-            } else if (parseInt(innerBox.id) > 60) {
-                //Same thing as above, just for player pieces
-                var newPiece = document.createElement('div');
-                newPiece.id = "player" + String(pieceNumber);
-                newPiece.className = "playerSoldier piece";
-                innerBox.appendChild(newPiece);
-                playerPositions.push(Number(innerBox.id));
-            }
-        }
-    }
-    //Just a test object, will be commented out soon
-    var newPiece = document.createElement('div');
-    newPiece.className = "enemySoldier piece";
-    document.getElementById('56').appendChild(newPiece);
-    enemyPositions[13] = 56;
-    console.log(enemyPositions[13]);
-}
-
-
-//Function that creates the board
-function setupBoard() {
-    //recognise the board div as a variable
-    var maindiv = document.getElementById('mainBoard');
-
-    //Iterate over all the squares
-    for (var acrossSquares = 1; acrossSquares <= 8; acrossSquares++) {
-        for (var downSquares = 1; downSquares <= 8; downSquares++) {
-            //Variable for the id
-            var name = String(acrossSquares) + String(downSquares);
-            //Create the square div
-            var newDiv = document.createElement('div');
-            //Give it an id and a class name
-            newDiv.id = name;
-            newDiv.className = "innerBoxes";
-            //Append it
-            maindiv.appendChild(newDiv);
-            //If its an even number, give it white, if its odd give it black
-            if ((acrossSquares + downSquares) % 2 == 0) {
-                newDiv.style.backgroundColor = "#ffffcc";
-            } else {
-                newDiv.style.backgroundColor = "#404040";
-                newDiv.className += " playableBox"
-            }
-        }
-    }
-
-    //Add pieces to the board
-    addPieces();
-
-}
 
 //This function is called when the game is started by the user. playerStarting is a bool that represents whether the game is to be started by the AI or the player
 function startGame(playerStarting) {
@@ -93,6 +18,11 @@ function startGame(playerStarting) {
 
 function playerMove() {
     //Check for mandatory moves
+    mandatoryMoves(userPositions, AIPositions);
+    //is there no mandatory moves?
+}
+
+function mandatoryMoves(playerPositions, enemyPositions) {
     for (var i = 0; i < playerPositions.length; i++) {
         //prevent variable hoisting
         (function() {
@@ -119,7 +49,6 @@ function playerMove() {
                             hasMoves = true;
                             validPiece.classList.add("valid");
                             validMoves.push(landingSquare);
-                            validPlayerPieces.push(String(playerPositions[i]));
                             console.log(landingSquare);
                         }
                     }
@@ -130,7 +59,7 @@ function playerMove() {
                 console.log(validMoves.length);
                 //pass an array showing the possible positions as well as the piece's id
                 $("#" + String(playerPositions[i])).on('click', function() {
-                    movePiece(validMoves, this)
+                    movePiece(validMoves, this, playerPositions, enemyPositions)
                 });
                 //validPiece.addEventListener("click", function() {movePiece(validMoves, this)});
             }
@@ -158,7 +87,7 @@ function checkPosition(playerPos, change) {
 }
 
 //recieved when a valid piece is clicked - recieves the possible positions and the id
-function movePiece(squaresToHighlight, caller) {
+function movePiece(squaresToHighlight, caller, playerPositions, enemyPositions) {
     cleanUp('landingSpace');
     console.log("clicked");
     for (var squares = 0; squares < squaresToHighlight.length; squares++) {
@@ -168,7 +97,7 @@ function movePiece(squaresToHighlight, caller) {
             //onclick, pass the id of the piece that needs to be moved, as well as the square its going to move to
             var landingSquare = squaresToHighlight[squares];
             $('#' + squaresToHighlight[squares]).on("click", function() {
-                commitMove(caller, landingSquare)
+                commitMove(caller, landingSquare, playerPositions, enemyPositions)
             });
             //squareToChange.addEventListener("click", commitMove.bind(caller, landingSquare));
         }());
@@ -176,7 +105,7 @@ function movePiece(squaresToHighlight, caller) {
     }
 }
 
-function commitMove(pieceToBeMoved, squareToMoveTo) {
+function commitMove(pieceToBeMoved, squareToMoveTo, playerPositions, enemyPositions) {
     //console.log(squareToMoveTo);
     //console.log(pieceToBeMoved);
     var piecePosition = Number(pieceToBeMoved.id);
@@ -212,12 +141,4 @@ function cleanUp(classToClean) {
     }
     //clean off the classes
     elements.removeClass(classToClean);
-    /*
-    while (elements.length) {
-      elements[0].classList.remove(classToClean);
-      if (clickListener) {
-        elements[0].removeEventListener("click", commitMove);
-      }
-    }
-    */
 }
